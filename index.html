@@ -1085,7 +1085,7 @@
 
       <div class="section-title">
         <span>Modèles Prédéfinis & Complexes</span>
-        <span>11 modèles</span>
+        <span>15 modèles</span>
       </div>
       <div id="preset-list"></div>
     </section>
@@ -1536,6 +1536,34 @@
   const STORAGE_QUICK = 'tabata_pro_quick_v2';
 
   const PRESETS = [
+    {
+      id: 'p_ronnestad_30_15',
+      name: 'Vélo Rønnestad 30/15 (3 × 13)',
+      desc: '3 blocs de 13 × 30s/15s • 3 min récup inter-blocs • 5 min retour au calme.',
+      mode: 'standard',
+      config: { prep: 15, work: 30, rest: 15, rounds: 13, cycles: 3, cycleRest: 180, cooldown: 300 }
+    },
+    {
+      id: 'p_kbox_flywheel',
+      name: 'kBox4 Flywheel (5 × 30s / 3m)',
+      desc: '5 séries de 30s (lancement + 6-8 reps excentriques) • 3 min récup ATP-PCr.',
+      mode: 'standard',
+      config: { prep: 10, work: 30, rest: 180, rounds: 5, cycles: 1, cycleRest: 0, cooldown: 0 }
+    },
+    {
+      id: 'p_iht_hypoxie',
+      name: 'Hypoxie Intermittente (5m / 3m × 5)',
+      desc: '5 cycles de 5 min hypoxie normobare / 3 min normoxie.',
+      mode: 'standard',
+      config: { prep: 15, work: 300, rest: 180, rounds: 5, cycles: 1, cycleRest: 0, cooldown: 60 }
+    },
+    {
+      id: 'p_rmt_powerbreathe',
+      name: 'RMT POWERbreathe (2 × 2m / 2m)',
+      desc: '2 blocs de 2 min (~30 inspirations) • 2 min récupération diaphragmatique.',
+      mode: 'standard',
+      config: { prep: 10, work: 120, rest: 120, rounds: 2, cycles: 1, cycleRest: 0, cooldown: 0 }
+    },
     {
       id: 'p_tabata',
       name: 'Tabata Classique (20/10)',
