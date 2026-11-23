@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#09090b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tabata Pro" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Tabata Pro — Intervalles & Pyramides</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #141417;
+      --surface-2: #1e1e24;
+      --surface-3: #27272f;
+      --border: #2c2c35;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+
+      --c-prep: #f59e0b;
+      --c-prep-bg: rgba(245, 158, 11, 0.14);
+      --c-work: #f43f5e;
+      --c-work-bg: rgba(244, 63, 94, 0.16);
+      --c-rest: #10b981;
+      --c-rest-bg: rgba(16, 185, 129, 0.14);
+      --c-cycle: #3b82f6;
+      --c-cycle-bg: rgba(59, 130, 246, 0.14);
+      --c-cool: #a855f7;
+      --c-cool-bg: rgba(168, 85, 247, 0.14);
+      --c-accent: #f43f5e;
+
+      --radius: 16px;
+      --radius-sm: 11px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+      background: var(--bg);
+    }
+
+    /* Header */
+    header {
+      padding: calc(14px + var(--safe-top)) 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+    }
+
+    .header-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Main Scroll Area */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 16px calc(92px + var(--safe-bottom));
+      scroll-behavior: smooth;
+    }
+
+    main::-webkit-scrollbar {
+      width: 4px;
+    }
+    main::-webkit-scrollbar-thumb {
+      background: var(--surface-3);
+      border-radius: 4px;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.18s ease-out;
+    }
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 20px 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title:first-child {
+      margin-top: 2px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    /* Quick Timer Hero */
+    .quick-card {
+      background: linear-gradient(160deg, #18181f 0%, #121216 100%);
+      border: 1px solid #322429;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .quick-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .quick-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .quick-total {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--c-work);
+      background: var(--c-work-bg);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .mini-stepper {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .mini-stepper label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .mini-stepper-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2px;
+    }
+
+    .mini-stepper-val {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 1.02rem;
+    }
+
+    .btn-tiny {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: var(--surface-3);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1rem;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .btn-tiny:active {
+      transform: scale(0.92);
+      background: #363642;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, opacity 0.15s;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--c-work);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.35);
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      width: auto;
+      font-size: 0.85rem;
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      border-radius: 9px;
+      width: auto;
+    }
+
+    /* Workout Preset Cards */
+    .workout-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .wc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .wc-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .wc-title {
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+    .tag-tabata { background: var(--c-work-bg); color: var(--c-work); }
+    .tag-prog { background: var(--c-prep-bg); color: var(--c-prep); }
+    .tag-multi { background: var(--c-cycle-bg); color: var(--c-cycle); }
+
+    .wc-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .wc-duration {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: var(--surface-2);
+      padding: 4px 9px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    /* Mini Bar Chart Preview */
+    .spark-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 22px;
+      padding: 2px 0;
+    }
+
+    .spark-bar {
+      flex: 1;
+      min-width: 2px;
+      max-width: 14px;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.2s;
+    }
+
+    .wc-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .wc-actions .btn-play {
+      flex: 1;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      font-size: 0.86rem;
+    }
+    .wc-actions .btn-play:active {
+      background: var(--c-work);
+      border-color: var(--c-work);
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .icon-btn:active {
+      transform: scale(0.93);
+      color: var(--text);
+    }
+    .icon-btn.danger:active {
+      color: var(--c-work);
+      border-color: var(--c-work);
+    }
+
+    /* Segmented Mode Tabs in Builder */
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .mode-tab {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 9px 4px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-tab.active {
+      background: var(--surface-3);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Form Controls */
+    .field-group {
+      margin-bottom: 12px;
+    }
+    .field-label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+    }
+    .text-input:focus {
+      border-color: var(--c-work);
+    }
+
+    /* Full Stepper Row */
+    .stepper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stepper-row:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .sr-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sr-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .sr-sub {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    .sr-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-step {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 1.05rem;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .btn-step:active {
+      background: var(--surface-3);
+      transform: scale(0.93);
+    }
+
+    .sr-val {
+      min-width: 64px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 0.96rem;
+      background: var(--surface-2);
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .sr-val:hover {
+      border-color: var(--border);
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      gap: 12px;
+    }
+
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--surface-3);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .switch input:checked + .slider {
+      background: var(--c-work);
+    }
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Live Preview Card in Builder */
+    .preview-box {
+      background: #111115;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 13px;
+      margin-bottom: 14px;
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+
+    .preview-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 46px;
+      padding: 6px;
+      background: var(--surface);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+    }
+
+    .preview-bar {
+      flex: 1;
+      min-width: 4px;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .preview-ribbon {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      max-height: 42px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Multi-Block Items */
+    .block-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .block-type-select {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .block-tools {
+      display: flex;
+      gap: 4px;
+    }
+
+    .block-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .block-param {
+      background: var(--surface-2);
+      border-radius: 9px;
+      padding: 7px 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .block-param span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    /* Bottom Navigation */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      background: rgba(14, 14, 18, 0.94);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 10px calc(8px + var(--safe-bottom));
+      z-index: 20;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .nav-btn.active {
+      color: var(--c-work);
+    }
+
+    /* Fullscreen Player Overlay */
+    #player {
+      position: fixed;
+      inset: 0;
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--bg);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: calc(14px + var(--safe-top)) 18px calc(20px + var(--safe-bottom));
+      transition: background-color 0.3s ease;
+    }
+    #player.open {
+      display: flex;
+    }
+
+    .player-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .player-title-box {
+      text-align: center;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .player-workout-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-meta {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .phase-banner {
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .phase-pill {
+      display: inline-block;
+      font-size: 0.92rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 999px;
+      background: var(--c-work-bg);
+      color: var(--c-work);
+    }
+
+    .phase-sub {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    /* SVG Ring Timer */
+    .ring-wrap {
+      position: relative;
+      width: min(74vw, 290px);
+      height: min(74vw, 290px);
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+    }
+
+    .ring-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 14;
+    }
+
+    .ring-fg {
+      fill: none;
+      stroke: var(--c-work);
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 753.98;
+      stroke-dashoffset: 0;
+      transition: stroke 0.25s ease;
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .time-main {
+      font-variant-numeric: tabular-nums;
+      font-size: clamp(3.3rem, 15vw, 4.4rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .time-step-counter {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Next Up & Total Progress */
+    .next-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .next-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .next-val {
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    .total-bar-wrap {
+      margin-top: 10px;
+    }
+
+    .total-bar-track {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .total-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--text);
+      transition: width 0.2s linear;
+    }
+
+    .total-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      margin-top: 5px;
+      font-weight: 600;
+    }
+
+    /* Player Controls */
+    .player-controls {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ctrl-btn {
+      height: 58px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .ctrl-btn:active {
+      transform: scale(0.95);
+    }
+
+    .ctrl-btn.main {
+      height: 66px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      font-size: 1.05rem;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Lock Overlay */
+    #lock-shield {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.72);
+      backdrop-filter: blur(4px);
+      z-index: 30;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: calc(48px + var(--safe-bottom));
+    }
+    #lock-shield.active {
+      display: flex;
+    }
+
+    .unlock-btn {
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      color: var(--text);
+      padding: 15px 26px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      top: calc(16px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: var(--surface-3);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      z-index: 300;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Summary Modal */
+    .summary-box {
+      text-align: center;
+      padding: 20px 10px;
+    }
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .stat-tile {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .stat-num {
+      font-size: 1.5rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-lbl {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="brand-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/>
+        </svg>
+      </div>
+      <span>Tabata Pro</span>
+    </div>
+    <span class="header-pill" id="pwa-status">100% Hors-ligne</span>
+  </header>
+
+  <main>
+    <!-- VUE 1 : SÉANCES & MODÈLES -->
+    <section id="view-home" class="view active">
+      <div class="card quick-card">
+        <div class="quick-top">
+          <div class="quick-title">
+            <span style="color:var(--c-work)">⚡</span> Démarrage Rapide
+          </div>
+          <div class="quick-total" id="quick-total-badge">04:00</div>
+        </div>
+        <div class="quick-grid">
+          <div class="mini-stepper">
+            <label>Effort</label>
+            <div class="mini-stepper-controls">
+              <button class="btn-tiny" onclick="adjustQuick('work', -5)">−</button>
+              <span class="mini-stepper-val" id="q-work">20s</span>
+              <button class="btn-tiny" onclick="adjustQuick('work', 5)">+</button>
+            </div>
+          </div>
+          <div class="mini-stepper">
+            <label>Repos</label>
+            <div class="mini-stepper-controls">
+              <button class="btn-tiny" onclick="adjustQuick('rest', -5)">−</button>
+              <span class="mini-stepper-val" id="q-rest">10s</span>
+              <button class="btn-tiny" onclick="adjustQuick('rest', 5)">+</button>
+            </div>
+          </div>
+          <div class="mini-stepper">
+            <label>Séries</label>
+            <div class="mini-stepper-controls">
+              <button class="btn-tiny" onclick="adjustQuick('rounds', -1)">−</button>
+              <span class="mini-stepper-val" id="q-rounds">8</span>
+              <button class="btn-tiny" onclick="adjustQuick('rounds', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="startQuickTimer()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Lancer maintenant
+        </button>
+      </div>
+
+      <div id="custom-section" style="display:none">
+        <div class="section-title">
+          <span>Mes Séances Enregistrées</span>
+          <span id="custom-count">0</span>
+        </div>
+        <div id="custom-list"></div>
+      </div>
+
+      <div class="section-title">
+        <span>Modèles Prédéfinis & Complexes</span>
+        <span>11 modèles</span>
+      </div>
+      <div id="preset-list"></div>
+    </section>
+
+    <!-- VUE 2 : CRÉATEUR AVANCÉ -->
+    <section id="view-builder" class="view">
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="standard" onclick="switchBuilderMode('standard')">Tabata Classique</button>
+        <button class="mode-tab" data-mode="progressive" onclick="switchBuilderMode('progressive')">Rampe / Pyramide</button>
+        <button class="mode-tab" data-mode="multiblock" onclick="switchBuilderMode('multiblock')">Multi-Blocs</button>
+      </div>
+
+      <div class="field-group">
+        <input type="text" id="b-name" class="text-input" placeholder="Nom de la séance (ex: Pyramide VO2, HIIT Variable...)" />
+      </div>
+
+      <!-- Aperçu Temps Réel -->
+      <div class="preview-box">
+        <div class="preview-top">
+          <strong id="prev-summary-count">8 intervalles d'effort</strong>
+          <span style="color:var(--c-work);font-weight:800;font-variant-numeric:tabular-nums" id="prev-total-time">Total : 04:10</span>
+        </div>
+        <div class="preview-chart" id="prev-chart"></div>
+        <div class="preview-ribbon" id="prev-ribbon"></div>
+      </div>
+
+      <!-- MODE 1 : STANDARD -->
+      <div id="builder-standard" class="card">
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-prep)"></span>
+            <div><div class="sr-name">Préparation</div><div class="sr-sub">Compte à rebours initial</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'prep', -5)">−</button>
+            <div class="sr-val" id="val-std-prep" onclick="promptField('std', 'prep', 'Préparation (sec)')">10s</div>
+            <button class="btn-step" onclick="stepField('std', 'prep', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-work)"></span>
+            <div><div class="sr-name">Effort</div><div class="sr-sub">Phase haute intensité</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'work', -5)">−</button>
+            <div class="sr-val" id="val-std-work" onclick="promptField('std', 'work', 'Effort (sec)')">20s</div>
+            <button class="btn-step" onclick="stepField('std', 'work', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-rest)"></span>
+            <div><div class="sr-name">Repos</div><div class="sr-sub">Récupération entre séries</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'rest', -5)">−</button>
+            <div class="sr-val" id="val-std-rest" onclick="promptField('std', 'rest', 'Repos (sec)')">10s</div>
+            <button class="btn-step" onclick="stepField('std', 'rest', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--text)"></span>
+            <div><div class="sr-name">Séries</div><div class="sr-sub">Répétitions par cycle</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'rounds', -1)">−</button>
+            <div class="sr-val" id="val-std-rounds" onclick="promptField('std', 'rounds', 'Nombre de séries')">8</div>
+            <button class="btn-step" onclick="stepField('std', 'rounds', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-cycle)"></span>
+            <div><div class="sr-name">Cycles</div><div class="sr-sub">Blocs complets</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'cycles', -1)">−</button>
+            <div class="sr-val" id="val-std-cycles" onclick="promptField('std', 'cycles', 'Nombre de cycles')">1</div>
+            <button class="btn-step" onclick="stepField('std', 'cycles', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-cycle)"></span>
+            <div><div class="sr-name">Repos inter-cycles</div><div class="sr-sub">Pause longue entre cycles</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'cycleRest', -15)">−</button>
+            <div class="sr-val" id="val-std-cycleRest" onclick="promptField('std', 'cycleRest', 'Repos inter-cycles (sec)')">60s</div>
+            <button class="btn-step" onclick="stepField('std', 'cycleRest', 15)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-cool)"></span>
+            <div><div class="sr-name">Retour au calme</div><div class="sr-sub">Fin de séance</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('std', 'cooldown', -15)">−</button>
+            <div class="sr-val" id="val-std-cooldown" onclick="promptField('std', 'cooldown', 'Retour au calme (sec)')">0s</div>
+            <button class="btn-step" onclick="stepField('std', 'cooldown', 15)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE 2 : PROGRESSIF / PYRAMIDE -->
+      <div id="builder-progressive" class="card" style="display:none">
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-prep)"></span>
+            <div><div class="sr-name">Préparation</div><div class="sr-sub">Délai avant départ</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'prep', -5)">−</button>
+            <div class="sr-val" id="val-prog-prep" onclick="promptField('prog', 'prep', 'Préparation (sec)')">10s</div>
+            <button class="btn-step" onclick="stepField('prog', 'prep', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-work)"></span>
+            <div><div class="sr-name">Effort initial</div><div class="sr-sub">Durée de la 1ère série</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'workStart', -5)">−</button>
+            <div class="sr-val" id="val-prog-workStart" onclick="promptField('prog', 'workStart', 'Effort initial (sec)')">10s</div>
+            <button class="btn-step" onclick="stepField('prog', 'workStart', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-work)"></span>
+            <div><div class="sr-name">Incrément Effort</div><div class="sr-sub">+ ou − à chaque série</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'workInc', -5)">−</button>
+            <div class="sr-val" id="val-prog-workInc" onclick="promptField('prog', 'workInc', 'Incrément effort (+/- sec)')">+10s</div>
+            <button class="btn-step" onclick="stepField('prog', 'workInc', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-rest)"></span>
+            <div><div class="sr-name">Repos initial</div><div class="sr-sub">Récupération 1ère série</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'restStart', -5)">−</button>
+            <div class="sr-val" id="val-prog-restStart" onclick="promptField('prog', 'restStart', 'Repos initial (sec)')">10s</div>
+            <button class="btn-step" onclick="stepField('prog', 'restStart', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--c-rest)"></span>
+            <div><div class="sr-name">Incrément Repos</div><div class="sr-sub">+ ou − à chaque repos</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'restInc', -5)">−</button>
+            <div class="sr-val" id="val-prog-restInc" onclick="promptField('prog', 'restInc', 'Incrément repos (+/- sec)')">+5s</div>
+            <button class="btn-step" onclick="stepField('prog', 'restInc', 5)">+</button>
+          </div>
+        </div>
+
+        <div class="stepper-row">
+          <div class="sr-info">
+            <span class="dot" style="background:var(--text)"></span>
+            <div><div class="sr-name">Paliers (montée)</div><div class="sr-sub">Nombre d'étapes</div></div>
+          </div>
+          <div class="sr-controls">
+            <button class="btn-step" onclick="stepField('prog', 'steps', -1)">−</button>
+            <div class="sr-val" id="val-prog-steps" onclick="promptField('prog', 'steps', 'Nombre de paliers')">4</div>
+            <button class="btn-step" onclick="stepField('prog', 'steps', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="toggle-row" style="border-top:1px solid var(--border);margin-top:4px">
+          <div>
+            <div class="sr-name">Mode Pyramide (Aller-Retour)</div>
+            <div class="sr-sub">Redescend automatiquement après le sommet</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="val-prog-pyramid" checked onchange="toggleProgOption('pyramid', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row" id="row-double-peak">
+          <div>
+            <div class="sr-name">Doubler le palier sommet</div>
+            <div class="sr-sub">Ex: 10-20-30-30-20-10s au lieu de 10-20-30-20-10s</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="val-prog-doublePeak" onchange="toggleProgOption('doublePeak', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- MODE 3 : MULTI-BLOCS -->
+      <div id="builder-multiblock" style="display:none">
+        <div id="blocks-container"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addMultiBlock('interval')">+ Bloc Intervalles</button>
+          <button class="btn btn-secondary btn-sm" style="width:100%" onclick="addMultiBlock('single')">+ Pause / Bloc Simple</button>
+        </div>
+      </div>
+
+      <!-- Actions Sauvegarde / Lancement -->
+      <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:10px;margin-top:6px">
+        <button class="btn btn-secondary" onclick="saveBuilderWorkout()">💾 Enregistrer</button>
+        <button class="btn btn-primary" onclick="launchBuilderWorkout()">▶ Lancer</button>
+      </div>
+    </section>
+
+    <!-- VUE 3 : RÉGLAGES & PWA -->
+    <section id="view-settings" class="view">
+      <div class="section-title"><span>Audio & Guidage</span></div>
+      <div class="card">
+        <div class="toggle-row">
+          <div>
+            <div class="sr-name">Signaux sonores (Web Audio)</div>
+            <div class="sr-sub">Bips distincts effort / repos / fin de séance</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-sound" onchange="updateSetting('sound', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row" style="border-top:1px solid var(--border)">
+          <div>
+            <div class="sr-name">Décompte vocal / bip 3-2-1</div>
+            <div class="sr-sub">Avertissement les 3 dernières secondes</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-countdown" onchange="updateSetting('countdown', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row" style="border-top:1px solid var(--border)">
+          <div>
+            <div class="sr-name">Annonces vocales (Français)</div>
+            <div class="sr-sub">Dicte la phase et la durée exacte des paliers</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-voice" onchange="updateSetting('voice', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row" style="border-top:1px solid var(--border)">
+          <div>
+            <div class="sr-name">Vibrations haptiques</div>
+            <div class="sr-sub">Vibration courte aux transitions sur mobile</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-vibrate" onchange="updateSetting('vibrate', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="toggle-row" style="border-top:1px solid var(--border)">
+          <div>
+            <div class="sr-name">Maintenir l'écran allumé</div>
+            <div class="sr-sub">Wake Lock API pendant tout l'entraînement</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="set-wakelock" onchange="updateSetting('wakelock', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn btn-secondary btn-sm" style="width:100%" onclick="testAudioFeedback()">🔊 Tester le son et la voix</button>
+        </div>
+      </div>
+
+      <div class="section-title"><span>Installation Smartphone (PWA)</span></div>
+      <div class="card">
+        <div class="wc-desc" style="margin-bottom:12px">
+          Pour utiliser <strong>Tabata Pro</strong> en plein écran sans barre de navigation et 100 % hors-ligne :
+          <br>• <strong>Android (Chrome)</strong> : Menu ⋮ → <em>Ajouter à l'écran d'accueil</em> ou <em>Installer l'application</em>.
+          <br>• <strong>iOS (Safari)</strong> : Partager → <em>Sur l'écran d'accueil</em>.
+        </div>
+        <button id="btn-install-pwa" class="btn btn-primary" style="display:none" onclick="triggerInstallPrompt()">📲 Installer l'application</button>
+      </div>
+
+      <div class="section-title"><span>Sauvegarde & Transfert</span></div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn btn-secondary btn-sm" style="width:100%" onclick="exportData()">📤 Exporter JSON</button>
+          <button class="btn btn-secondary btn-sm" style="width:100%" onclick="document.getElementById('import-file').click()">📥 Importer JSON</button>
+        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)" />
+      </div>
+    </section>
+  </main>
+
+  <!-- Navigation Basse -->
+  <nav>
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Séances</span>
+    </button>
+    <button class="nav-btn" data-tab="builder" onclick="switchTab('builder')">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+      <span>Créer</span>
+    </button>
+    <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Réglages</span>
+    </button>
+  </nav>
+
+  <!-- LECTEUR PLEIN ÉCRAN -->
+  <div id="player">
+    <div class="player-top">
+      <button class="icon-btn" onclick="closePlayer()" title="Quitter">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+      <div class="player-title-box">
+        <div class="player-workout-name" id="pl-title">Tabata Classique</div>
+        <div class="player-meta" id="pl-step-meta">Étape 1 / 16</div>
+      </div>
+      <button class="icon-btn" onclick="lockScreen()" title="Verrouiller l'écran">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </button>
+    </div>
+
+    <div id="player-active-body" style="display:flex;flex-direction:column;justify-content:space-between;flex:1;padding:10px 0">
+      <div class="phase-banner">
+        <div class="phase-pill" id="pl-phase-badge">PRÉPARATION</div>
+        <div class="phase-sub" id="pl-phase-sub">Préparez-vous</div>
+      </div>
+
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 260 260">
+          <circle class="ring-bg" cx="130" cy="130" r="120"></circle>
+          <circle class="ring-fg" id="pl-ring" cx="130" cy="130" r="120"></circle>
+        </svg>
+        <div class="ring-center">
+          <div class="time-main" id="pl-time">00:10</div>
+          <div class="time-step-counter" id="pl-round-badge">Série 1 / 8</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="next-card">
+          <div>
+            <div class="next-label">À suivre</div>
+            <div class="next-val" id="pl-next">Effort • 20s</div>
+          </div>
+          <div id="pl-next-dur" style="font-weight:800;color:var(--text-muted);font-variant-numeric:tabular-nums">20s</div>
+        </div>
+
+        <div class="total-bar-wrap">
+          <div class="total-bar-track">
+            <div class="total-bar-fill" id="pl-total-fill"></div>
+          </div>
+          <div class="total-bar-labels">
+            <span id="pl-elapsed">Écoulé : 00:00</span>
+            <span id="pl-remaining">Restant : 04:00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-controls">
+        <button class="ctrl-btn" onclick="skipStep(-1)">⏮ Préc.</button>
+        <button class="ctrl-btn main" id="pl-play-pause" onclick="togglePause()">⏸ Pause</button>
+        <button class="ctrl-btn" onclick="skipStep(1)">Suiv. ⏭</button>
+      </div>
+    </div>
+
+    <!-- Écran de fin de séance -->
+    <div id="player-done-body" style="display:none;flex:1;flex-direction:column;justify-content:center">
+      <div class="summary-box">
+        <div style="font-size:3rem;margin-bottom:8px">🏆</div>
+        <h2 style="margin:0 0 6px;font-size:1.5rem">Séance terminée !</h2>
+        <p style="margin:0;color:var(--text-muted);font-size:0.9rem" id="done-name">Tabata Classique</p>
+        <div class="summary-stats">
+          <div class="stat-tile">
+            <div class="stat-num" id="done-total-time">04:10</div>
+            <div class="stat-lbl">Durée totale</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-num" id="done-work-time" style="color:var(--c-work)">02:40</div>
+            <div class="stat-lbl">Temps d'effort</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px">
+          <button class="btn btn-secondary" onclick="restartWorkout()">↻ Recommencer</button>
+          <button class="btn btn-primary" onclick="closePlayer()">Terminer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouclier Verrouillage Tactile -->
+    <div id="lock-shield" ondblclick="unlockScreen()">
+      <div style="color:var(--text-muted);font-size:0.82rem;margin-bottom:12px;font-weight:700">Écran verrouillé (anti-fausses touches)</div>
+      <button class="unlock-btn" id="unlock-hold-btn"
+        onpointerdown="startUnlockHold()"
+        onpointerup="cancelUnlockHold()"
+        onpointerleave="cancelUnlockHold()">
+        Maintenir 0,8s ou double-taper pour déverrouiller
+      </button>
+    </div>
+  </div>
+
+  <div id="toast">Enregistré</div>
+</div>
+
+<script>
+  /* ================= SERVICE WORKER REGISTRATION ================= */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const btn = document.getElementById('btn-install-pwa');
+    if (btn) btn.style.display = 'inline-flex';
+  });
+
+  function triggerInstallPrompt() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => {
+      deferredInstallPrompt = null;
+      document.getElementById('btn-install-pwa').style.display = 'none';
+    });
+  }
+
+  /* ================= DONNÉES & MODÈLES PRÉDÉFINIS ================= */
+  const STORAGE_WORKOUTS = 'tabata_pro_custom_v2';
+  const STORAGE_SETTINGS = 'tabata_pro_settings_v2';
+  const STORAGE_QUICK = 'tabata_pro_quick_v2';
+
+  const PRESETS = [
+    {
+      id: 'p_tabata',
+      name: 'Tabata Classique (20/10)',
+      desc: 'Protocole original Dr. Izumi Tabata : 8 × 20s effort max / 10s repos.',
+      mode: 'standard',
+      config: { prep: 10, work: 20, rest: 10, rounds: 8, cycles: 1, cycleRest: 60, cooldown: 0 }
+    },
+    {
+      id: 'p_pyr_sprint',
+      name: 'Pyramide Sprint 10→40→10s',
+      desc: 'Montée +10s jusqu’à 40s puis redescente progressive, repos proportionnel.',
+      mode: 'progressive',
+      config: { prep: 10, workStart: 10, workInc: 10, restStart: 10, restInc: 5, steps: 4, pyramid: true, doublePeak: false }
+    },
+    {
+      id: 'p_stair_vo2',
+      name: 'Escalier VO2 / Seuil (1→4 min)',
+      desc: 'Rampe ascendante 1 min, 2 min, 3 min, 4 min avec récupération active.',
+      mode: 'progressive',
+      config: { prep: 15, workStart: 60, workInc: 60, restStart: 45, restInc: 15, steps: 4, pyramid: false, doublePeak: false }
+    },
+    {
+      id: 'p_hiit_var',
+      name: 'HIIT Répétitions Variables',
+      desc: 'Bloc 1 : 4× 40/20s • Pause 90s • Bloc 2 : 6× 20/10s • Bloc 3 : 8× 15/10s.',
+      mode: 'multiblock',
+      config: {
+        blocks: [
+          { id: 'b1', kind: 'single', phase: 'prep', label: 'Préparation', duration: 10 },
+          { id: 'b2', kind: 'interval', label: 'Bloc Endurance Force', rounds: 4, work: 40, workInc: 0, rest: 20, restInc: 0 },
+          { id: 'b3', kind: 'single', phase: 'cycle', label: 'Récupération Inter-Blocs', duration: 90 },
+          { id: 'b4', kind: 'interval', label: 'Bloc Tabata', rounds: 6, work: 20, workInc: 0, rest: 10, restInc: 0 },
+          { id: 'b5', kind: 'single', phase: 'cycle', label: 'Récupération Inter-Blocs', duration: 60 },
+          { id: 'b6', kind: 'interval', label: 'Finishers Explosifs', rounds: 8, work: 15, workInc: 0, rest: 10, restInc: 0 }
+        ]
+      }
+    },
+    {
+      id: 'p_lactate_down',
+      name: 'Dégressif Lactique (50s → 10s)',
+      desc: 'Départ long à haute charge (50s) puis réduction de 10s par palier.',
+      mode: 'progressive',
+      config: { prep: 10, workStart: 50, workInc: -10, restStart: 25, restInc: -5, steps: 5, pyramid: false, doublePeak: false }
+    },
+    {
+      id: 'p_double_tabata',
+      name: 'Double Tabata (2 Cycles)',
+      desc: 'Deux blocs Tabata complets séparés par 60s de récupération.',
+      mode: 'standard',
+      config: { prep: 10, work: 20, rest: 10, rounds: 8, cycles: 2, cycleRest: 60, cooldown: 30 }
+    },
+    {
+      id: 'p_30_30',
+      name: 'Intermittents 30/30 (10 séries)',
+      desc: 'Classique PMA / course à pied et cyclisme : 30s intense / 30s actif.',
+      mode: 'standard',
+      config: { prep: 10, work: 30, rest: 30, rounds: 10, cycles: 1, cycleRest: 60, cooldown: 0 }
+    },
+    {
+      id: 'p_40_20',
+      name: 'HIIT 40/20 (8 séries)',
+      desc: 'Ratio 2:1 exigeant pour la tolérance à l’effort soutenu.',
+      mode: 'standard',
+      config: { prep: 10, work: 40, rest: 20, rounds: 8, cycles: 1, cycleRest: 60, cooldown: 0 }
+    },
+    {
+      id: 'p_4x4',
+      name: '4 × 4 min Norvégien (VO2max)',
+      desc: '4 intervalles de 4 minutes à 90-95% FCmax avec 3 minutes de récup.',
+      mode: 'standard',
+      config: { prep: 15, work: 240, rest: 180, rounds: 4, cycles: 1, cycleRest: 60, cooldown: 120 }
+    },
+    {
+      id: 'p_emom10',
+      name: 'EMOM 10 Minutes',
+      desc: '10 intervalles de 60 secondes sans temps mort.',
+      mode: 'standard',
+      config: { prep: 10, work: 60, rest: 0, rounds: 10, cycles: 1, cycleRest: 0, cooldown: 0 }
+    },
+    {
+      id: 'p_core_pyr',
+      name: 'Pyramide Gainage / Core (20→60→20s)',
+      desc: 'Isométrie progressive avec sommet doublé à 60 secondes.',
+      mode: 'progressive',
+      config: { prep: 10, workStart: 20, workInc: 10, restStart: 10, restInc: 0, steps: 5, pyramid: true, doublePeak: true }
+    }
+  ];
+
+  let customWorkouts = JSON.parse(localStorage.getItem(STORAGE_WORKOUTS) || '[]');
+  let quickState = JSON.parse(localStorage.getItem(STORAGE_QUICK) || '{"work":20,"rest":10,"rounds":8}');
+  let settings = Object.assign({
+    sound: true,
+    countdown: true,
+    voice: true,
+    vibrate: true,
+    wakelock: true
+  }, JSON.parse(localStorage.getItem(STORAGE_SETTINGS) || '{}'));
+
+  /* ================= ÉTAT DU CRÉATEUR ================= */
+  let builderMode = 'standard';
+  let editingId = null;
+
+  let stdDraft = { prep: 10, work: 20, rest: 10, rounds: 8, cycles: 1, cycleRest: 60, cooldown: 0 };
+  let progDraft = { prep: 10, workStart: 10, workInc: 10, restStart: 10, restInc: 5, steps: 4, pyramid: true, doublePeak: false };
+  let multiDraft = [
+    { id: 'm1', kind: 'single', phase: 'prep', label: 'Préparation', duration: 10 },
+    { id: 'm2', kind: 'interval', label: 'Bloc 1', rounds: 4, work: 30, workInc: 0, rest: 15, restInc: 0 },
+    { id: 'm3', kind: 'single', phase: 'cycle', label: 'Pause', duration: 60 },
+    { id: 'm4', kind: 'interval', label: 'Bloc 2', rounds: 6, work: 20, workInc: 0, rest: 10, restInc: 0 }
+  ];
+
+  /* ================= COMPILATEUR DE TIMELINE ================= */
+  function compileWorkout(workout) {
+    const steps = [];
+    const cfg = workout.config;
+
+    if (workout.mode === 'standard') {
+      if (cfg.prep > 0) {
+        steps.push({ phase: 'prep', label: 'Préparation', sub: 'Mise en place', duration: cfg.prep, roundInfo: 'Départ' });
+      }
+      for (let c = 1; c <= cfg.cycles; c++) {
+        for (let r = 1; r <= cfg.rounds; r++) {
+          const cyclePrefix = cfg.cycles > 1 ? `Cycle ${c}/${cfg.cycles} • ` : '';
+          steps.push({
+            phase: 'work',
+            label: 'EFFORT',
+            sub: `${cyclePrefix}Série ${r} sur ${cfg.rounds}`,
+            duration: cfg.work,
+            roundInfo: `Série ${r}/${cfg.rounds}`
+          });
+          const isLastRoundOfCycle = (r === cfg.rounds);
+          const isLastCycle = (c === cfg.cycles);
+          if (!isLastRoundOfCycle && cfg.rest > 0) {
+            steps.push({
+              phase: 'rest',
+              label: 'REPOS',
+              sub: `${cyclePrefix}Récupération`,
+              duration: cfg.rest,
+              roundInfo: `Série ${r}/${cfg.rounds}`
+            });
+          } else if (isLastRoundOfCycle && !isLastCycle && cfg.cycleRest > 0) {
+            steps.push({
+              phase: 'cycle',
+              label: 'REPOS CYCLE',
+              sub: `Fin du cycle ${c}/${cfg.cycles}`,
+              duration: cfg.cycleRest,
+              roundInfo: `Cycle ${c}/${cfg.cycles}`
+            });
+          }
+        }
+      }
+      if (cfg.cooldown > 0) {
+        steps.push({ phase: 'cool', label: 'RETOUR AU CALME', sub: 'Récupération finale', duration: cfg.cooldown, roundInfo: 'Fin' });
+      }
+    }
+    else if (workout.mode === 'progressive') {
+      if (cfg.prep > 0) {
+        steps.push({ phase: 'prep', label: 'Préparation', sub: 'Mise en place', duration: cfg.prep, roundInfo: 'Départ' });
+      }
+      const indices = [];
+      for (let i = 0; i < cfg.steps; i++) indices.push(i);
+      if (cfg.pyramid && cfg.steps > 1) {
+        const startDown = cfg.doublePeak ? cfg.steps - 1 : cfg.steps - 2;
+        for (let i = startDown; i >= 0; i--) indices.push(i);
+      }
+
+      indices.forEach((stepIdx, pos) => {
+        const wDur = Math.max(5, cfg.workStart + stepIdx * cfg.workInc);
+        const rDur = Math.max(0, cfg.restStart + stepIdx * cfg.restInc);
+        const totalPaliers = indices.length;
+        const dirTag = cfg.pyramid
+          ? (pos < cfg.steps ? '↑ Montée' : '↓ Descente')
+          : 'Palier';
+
+        steps.push({
+          phase: 'work',
+          label: 'EFFORT',
+          sub: `${dirTag} ${pos + 1}/${totalPaliers} (${formatSecShort(wDur)})`,
+          duration: wDur,
+          roundInfo: `Palier ${pos + 1}/${totalPaliers}`
+        });
+
+        if (pos < totalPaliers - 1 && rDur > 0) {
+          steps.push({
+            phase: 'rest',
+            label: 'REPOS',
+            sub: `Récupération (${formatSecShort(rDur)})`,
+            duration: rDur,
+            roundInfo: `Palier ${pos + 1}/${totalPaliers}`
+          });
+        }
+      });
+    }
+    else if (workout.mode === 'multiblock') {
+      (cfg.blocks || []).forEach((blk, bIdx) => {
+        if (blk.kind === 'single') {
+          if (blk.duration > 0) {
+            const pMap = { prep: 'PRÉPARATION', work: 'EFFORT', rest: 'REPOS', cycle: 'PAUSE', cool: 'RETOUR AU CALME' };
+            steps.push({
+              phase: blk.phase || 'rest',
+              label: pMap[blk.phase] || 'BLOC',
+              sub: blk.label || `Bloc ${bIdx + 1}`,
+              duration: blk.duration,
+              roundInfo: blk.label || `Bloc ${bIdx + 1}`
+            });
+          }
+        } else {
+          for (let r = 0; r < blk.rounds; r++) {
+            const wDur = Math.max(5, blk.work + r * (blk.workInc || 0));
+            const rDur = Math.max(0, blk.rest + r * (blk.restInc || 0));
+            steps.push({
+              phase: 'work',
+              label: 'EFFORT',
+              sub: `${blk.label || 'Bloc'} • Série ${r + 1}/${blk.rounds}`,
+              duration: wDur,
+              roundInfo: `${blk.label || 'Bloc'} ${r + 1}/${blk.rounds}`
+            });
+            if (r < blk.rounds - 1 && rDur > 0) {
+              steps.push({
+                phase: 'rest',
+                label: 'REPOS',
+                sub: `${blk.label || 'Bloc'} • Récupération`,
+                duration: rDur,
+                roundInfo: `${blk.label || 'Bloc'} ${r + 1}/${blk.rounds}`
+              });
+            }
+          }
+        }
+      });
+    }
+
+    if (steps.length === 0) {
+      steps.push({ phase: 'work', label: 'EFFORT', sub: 'Série unique', duration: 20, roundInfo: '1/1' });
+    }
+    return steps;
+  }
+
+  function getTimelineStats(steps) {
+    let total = 0;
+    let workTotal = 0;
+    let workCount = 0;
+    steps.forEach(s => {
+      total += s.duration;
+      if (s.phase === 'work') {
+        workTotal += s.duration;
+        workCount++;
+      }
+    });
+    return { total, workTotal, workCount };
+  }
+
+  /* ================= UTILITAIRES FORMATAGE ================= */
+  function formatMMSS(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  function formatSecShort(sec) {
+    if (sec < 60) return `${sec}s`;
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return s === 0 ? `${m}m` : `${m}m${String(s).padStart(2, '0')}`;
+  }
+
+  function formatSignedSec(sec) {
+    return sec >= 0 ? `+${sec}s` : `${sec}s`;
+  }
+
+  function phaseColor(phase) {
+    const map = {
+      prep: 'var(--c-prep)',
+      work: 'var(--c-work)',
+      rest: 'var(--c-rest)',
+      cycle: 'var(--c-cycle)',
+      cool: 'var(--c-cool)'
+    };
+    return map[phase] || 'var(--c-work)';
+  }
+
+  function phaseBg(phase) {
+    const map = {
+      prep: 'var(--c-prep-bg)',
+      work: 'var(--c-work-bg)',
+      rest: 'var(--c-rest-bg)',
+      cycle: 'var(--c-cycle-bg)',
+      cool: 'var(--c-cool-bg)'
+    };
+    return map[phase] || 'var(--c-work-bg)';
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2100);
+  }
+
+  /* ================= NAVIGATION ONGLETS ================= */
+  function switchTab(tabName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${tabName}`).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === tabName);
+    });
+    if (tabName === 'builder') updateBuilderPreview();
+  }
+
+  /* ================= QUICK TIMER ================= */
+  function renderQuickTimer() {
+    document.getElementById('q-work').textContent = formatSecShort(quickState.work);
+    document.getElementById('q-rest').textContent = formatSecShort(quickState.rest);
+    document.getElementById('q-rounds').textContent = quickState.rounds;
+    const total = quickState.rounds * quickState.work + Math.max(0, quickState.rounds - 1) * quickState.rest;
+    document.getElementById('quick-total-badge').textContent = formatMMSS(total);
+  }
+
+  function adjustQuick(key, delta) {
+    if (key === 'work') quickState.work = Math.max(5, Math.min(3600, quickState.work + delta));
+    if (key === 'rest') quickState.rest = Math.max(0, Math.min(1800, quickState.rest + delta));
+    if (key === 'rounds') quickState.rounds = Math.max(1, Math.min(99, quickState.rounds + delta));
+    localStorage.setItem(STORAGE_QUICK, JSON.stringify(quickState));
+    renderQuickTimer();
+  }
+
+  function startQuickTimer() {
+    launchWorkout({
+      name: `Timer Rapide (${formatSecShort(quickState.work)}/${formatSecShort(quickState.rest)} × ${quickState.rounds})`,
+      mode: 'standard',
+      config: {
+        prep: 5,
+        work: quickState.work,
+        rest: quickState.rest,
+        rounds: quickState.rounds,
+        cycles: 1,
+        cycleRest: 0,
+        cooldown: 0
+      }
+    });
+  }
+
+  /* ================= RENDU LISTES (MODÈLES & PERSO) ================= */
+  function buildSparkBarsHTML(steps, maxBars = 36) {
+    const filtered = steps.filter(s => s.phase !== 'prep');
+    const slice = filtered.slice(0, maxBars);
+    if (slice.length === 0) return '';
+    const maxDur = Math.max(...slice.map(s => s.duration), 1);
+    return `<div class="spark-bars">${slice.map(s => {
+      const h = Math.max(18, Math.round((s.duration / maxDur) * 100));
+      return `<div class="spark-bar" style="height:${h}%;background:${phaseColor(s.phase)}"></div>`;
+    }).join('')}</div>`;
+  }
+
+  function renderWorkoutLists() {
+    const presetContainer = document.getElementById('preset-list');
+    presetContainer.innerHTML = PRESETS.map(w => renderWorkoutCardHTML(w, false)).join('');
+
+    const customSection = document.getElementById('custom-section');
+    const customContainer = document.getElementById('custom-list');
+    document.getElementById('custom-count').textContent = customWorkouts.length;
+
+    if (customWorkouts.length > 0) {
+      customSection.style.display = 'block';
+      customContainer.innerHTML = customWorkouts.map(w => renderWorkoutCardHTML(w, true)).join('');
+    } else {
+      customSection.style.display = 'none';
+    }
+  }
+
+  function renderWorkoutCardHTML(w, isCustom) {
+    const steps = compileWorkout(w);
+    const stats = getTimelineStats(steps);
+    const tagMap = {
+      standard: ['Standard', 'tag-tabata'],
+      progressive: [w.config.pyramid ? 'Pyramide' : 'Progressif', 'tag-prog'],
+      multiblock: ['Multi-Blocs', 'tag-multi']
+    };
+    const [tagLabel, tagClass] = tagMap[w.mode] || ['Intervalles', 'tag-tabata'];
+
+    return `
+      <div class="workout-card">
+        <div class="wc-header">
+          <div class="wc-title-wrap">
+            <div class="wc-title">
+              <span>${escapeHTML(w.name)}</span>
+              <span class="tag ${tagClass}">${tagLabel}</span>
+            </div>
+            <div class="wc-desc">${escapeHTML(w.desc || `${stats.workCount} efforts • ${formatMMSS(stats.workTotal)} de travail`)}</div>
+          </div>
+          <div class="wc-duration">${formatMMSS(stats.total)}</div>
+        </div>
+        ${buildSparkBarsHTML(steps)}
+        <div class="wc-actions">
+          <button class="btn btn-play" onclick="startSavedWorkout('${w.id}', ${isCustom})">▶ Démarrer</button>
+          <button class="icon-btn" onclick="loadIntoBuilder('${w.id}', ${isCustom})" title="Modifier / Dupliquer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+          ${isCustom ? `
+          <button class="icon-btn danger" onclick="deleteCustomWorkout('${w.id}')" title="Supprimer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          </button>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+
+  function findWorkout(id, isCustom) {
+    const list = isCustom ? customWorkouts : PRESETS;
+    return list.find(x => x.id === id);
+  }
+
+  function startSavedWorkout(id, isCustom) {
+    const w = findWorkout(id, isCustom);
+    if (w) launchWorkout(w);
+  }
+
+  function deleteCustomWorkout(id) {
+    customWorkouts = customWorkouts.filter(w => w.id !== id);
+    localStorage.setItem(STORAGE_WORKOUTS, JSON.stringify(customWorkouts));
+    renderWorkoutLists();
+    showToast('Séance supprimée');
+  }
+
+  /* ================= LOGIQUE DU CRÉATEUR ================= */
+  function switchBuilderMode(mode) {
+    builderMode = mode;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    document.getElementById('builder-standard').style.display = mode === 'standard' ? 'block' : 'none';
+    document.getElementById('builder-progressive').style.display = mode === 'progressive' ? 'block' : 'none';
+    document.getElementById('builder-multiblock').style.display = mode === 'multiblock' ? 'block' : 'none';
+    if (mode === 'multiblock') renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function syncBuilderUI() {
+    // Standard
+    ['prep', 'work', 'rest', 'cycleRest', 'cooldown'].forEach(k => {
+      document.getElementById(`val-std-${k}`).textContent = formatSecShort(stdDraft[k]);
+    });
+    document.getElementById('val-std-rounds').textContent = stdDraft.rounds;
+    document.getElementById('val-std-cycles').textContent = stdDraft.cycles;
+
+    // Progressive
+    document.getElementById('val-prog-prep').textContent = formatSecShort(progDraft.prep);
+    document.getElementById('val-prog-workStart').textContent = formatSecShort(progDraft.workStart);
+    document.getElementById('val-prog-workInc').textContent = formatSignedSec(progDraft.workInc);
+    document.getElementById('val-prog-restStart').textContent = formatSecShort(progDraft.restStart);
+    document.getElementById('val-prog-restInc').textContent = formatSignedSec(progDraft.restInc);
+    document.getElementById('val-prog-steps').textContent = progDraft.steps;
+    document.getElementById('val-prog-pyramid').checked = progDraft.pyramid;
+    document.getElementById('val-prog-doublePeak').checked = progDraft.doublePeak;
+    document.getElementById('row-double-peak').style.display = progDraft.pyramid ? 'flex' : 'none';
+
+    updateBuilderPreview();
+  }
+
+  function stepField(group, key, delta) {
+    const obj = group === 'std' ? stdDraft : progDraft;
+    const limits = {
+      prep: [0, 300],
+      work: [5, 3600],
+      rest: [0, 1800],
+      rounds: [1, 99],
+      cycles: [1, 20],
+      cycleRest: [0, 1800],
+      cooldown: [0, 1800],
+      workStart: [5, 1800],
+      workInc: [-300, 300],
+      restStart: [0, 900],
+      restInc: [-180, 180],
+      steps: [2, 20]
+    };
+    const [min, max] = limits[key] || [0, 3600];
+    obj[key] = Math.max(min, Math.min(max, obj[key] + delta));
+    syncBuilderUI();
+  }
+
+  function promptField(group, key, label) {
+    const obj = group === 'std' ? stdDraft : progDraft;
+    const raw = prompt(`${label} :`, obj[key]);
+    if (raw === null) return;
+    const num = parseInt(raw, 10);
+    if (!isNaN(num)) {
+      obj[key] = num;
+      stepField(group, key, 0);
+    }
+  }
+
+  function toggleProgOption(key, checked) {
+    progDraft[key] = checked;
+    syncBuilderUI();
+  }
+
+  /* Multi-Blocs */
+  function renderMultiBlocks() {
+    const container = document.getElementById('blocks-container');
+    container.innerHTML = multiDraft.map((blk, idx) => {
+      if (blk.kind === 'single') {
+        return `
+          <div class="block-item">
+            <div class="block-head">
+              <select class="block-type-select" onchange="updateBlock(${idx}, 'phase', this.value)">
+                <option value="prep" ${blk.phase === 'prep' ? 'selected' : ''}>🟡 Préparation</option>
+                <option value="work" ${blk.phase === 'work' ? 'selected' : ''}>🔴 Effort continu</option>
+                <option value="cycle" ${blk.phase === 'cycle' ? 'selected' : ''}>🔵 Pause / Transition</option>
+                <option value="cool" ${blk.phase === 'cool' ? 'selected' : ''}>🟣 Retour au calme</option>
+              </select>
+              <div class="block-tools">
+                <button class="btn-tiny" onclick="moveBlock(${idx}, -1)">↑</button>
+                <button class="btn-tiny" onclick="moveBlock(${idx}, 1)">↓</button>
+                <button class="btn-tiny" style="color:var(--c-work)" onclick="removeBlock(${idx})">✕</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" class="text-input" style="padding:8px 10px;font-size:0.85rem" value="${escapeHTML(blk.label)}" onchange="updateBlock(${idx}, 'label', this.value)" placeholder="Libellé" />
+              <div class="block-param" style="min-width:130px">
+                <button class="btn-tiny" onclick="stepBlock(${idx}, 'duration', -5)">−</button>
+                <strong style="font-variant-numeric:tabular-nums">${formatSecShort(blk.duration)}</strong>
+                <button class="btn-tiny" onclick="stepBlock(${idx}, 'duration', 5)">+</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="block-item">
+            <div class="block-head">
+              <input type="text" class="text-input" style="padding:6px 10px;font-size:0.86rem" value="${escapeHTML(blk.label)}" onchange="updateBlock(${idx}, 'label', this.value)" placeholder="Nom du bloc" />
+              <div class="block-tools">
+                <button class="btn-tiny" onclick="moveBlock(${idx}, -1)">↑</button>
+                <button class="btn-tiny" onclick="moveBlock(${idx}, 1)">↓</button>
+                <button class="btn-tiny" onclick="duplicateBlock(${idx})">⧉</button>
+                <button class="btn-tiny" style="color:var(--c-work)" onclick="removeBlock(${idx})">✕</button>
+              </div>
+            </div>
+            <div class="block-grid">
+              <div class="block-param">
+                <span>Séries</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'rounds', -1)">−</button>
+                  <strong>${blk.rounds}</strong>
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'rounds', 1)">+</button>
+                </div>
+              </div>
+              <div class="block-param">
+                <span>Effort</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'work', -5)">−</button>
+                  <strong>${formatSecShort(blk.work)}</strong>
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'work', 5)">+</button>
+                </div>
+              </div>
+              <div class="block-param">
+                <span>Repos</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'rest', -5)">−</button>
+                  <strong>${formatSecShort(blk.rest)}</strong>
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'rest', 5)">+</button>
+                </div>
+              </div>
+              <div class="block-param">
+                <span>Incr. Effort</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'workInc', -5)">−</button>
+                  <strong>${formatSignedSec(blk.workInc || 0)}</strong>
+                  <button class="btn-tiny" onclick="stepBlock(${idx}, 'workInc', 5)">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }).join('');
+  }
+
+  function addMultiBlock(kind) {
+    const id = 'b_' + Date.now();
+    if (kind === 'single') {
+      multiDraft.push({ id, kind: 'single', phase: 'cycle', label: 'Récupération', duration: 60 });
+    } else {
+      multiDraft.push({ id, kind: 'interval', label: `Bloc ${multiDraft.length + 1}`, rounds: 4, work: 30, workInc: 0, rest: 15, restInc: 0 });
+    }
+    renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function updateBlock(idx, key, val) {
+    multiDraft[idx][key] = val;
+    updateBuilderPreview();
+  }
+
+  function stepBlock(idx, key, delta) {
+    const blk = multiDraft[idx];
+    if (key === 'rounds') blk.rounds = Math.max(1, Math.min(50, blk.rounds + delta));
+    else if (key === 'work' || key === 'duration') blk[key] = Math.max(5, Math.min(3600, blk[key] + delta));
+    else if (key === 'rest') blk.rest = Math.max(0, Math.min(1800, blk.rest + delta));
+    else if (key === 'workInc') blk.workInc = Math.max(-180, Math.min(180, (blk.workInc || 0) + delta));
+    renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function moveBlock(idx, dir) {
+    const target = idx + dir;
+    if (target < 0 || target >= multiDraft.length) return;
+    const tmp = multiDraft[idx];
+    multiDraft[idx] = multiDraft[target];
+    multiDraft[target] = tmp;
+    renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function duplicateBlock(idx) {
+    const copy = JSON.parse(JSON.stringify(multiDraft[idx]));
+    copy.id = 'b_' + Date.now();
+    multiDraft.splice(idx + 1, 0, copy);
+    renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function removeBlock(idx) {
+    if (multiDraft.length <= 1) {
+      showToast('Au moins 1 bloc requis');
+      return;
+    }
+    multiDraft.splice(idx, 1);
+    renderMultiBlocks();
+    updateBuilderPreview();
+  }
+
+  function getBuilderWorkoutObject() {
+    const rawName = document.getElementById('b-name').value.trim();
+    const defaultNames = {
+      standard: `Tabata ${formatSecShort(stdDraft.work)}/${formatSecShort(stdDraft.rest)}`,
+      progressive: progDraft.pyramid ? `Pyramide ${formatSecShort(progDraft.workStart)}` : `Rampe ${formatSecShort(progDraft.workStart)}`,
+      multiblock: 'Séance Multi-Blocs'
+    };
+    const name = rawName || defaultNames[builderMode];
+
+    let config;
+    if (builderMode === 'standard') config = JSON.parse(JSON.stringify(stdDraft));
+    else if (builderMode === 'progressive') config = JSON.parse(JSON.stringify(progDraft));
+    else config = { blocks: JSON.parse(JSON.stringify(multiDraft)) };
+
+    return {
+      id: editingId || ('c_' + Date.now()),
+      name,
+      mode: builderMode,
+      config
+    };
+  }
+
+  function updateBuilderPreview() {
+    const w = getBuilderWorkoutObject();
+    const steps = compileWorkout(w);
+    const stats = getTimelineStats(steps);
+
+    document.getElementById('prev-summary-count').textContent = `${stats.workCount} efforts (${formatMMSS(stats.workTotal)})`;
+    document.getElementById('prev-total-time').textContent = `Total : ${formatMMSS(stats.total)}`;
+
+    const maxDur = Math.max(...steps.map(s => s.duration), 1);
+    document.getElementById('prev-chart').innerHTML = steps.map(s => {
+      const h = Math.max(16, Math.round((s.duration / maxDur) * 100));
+      return `<div class="preview-bar" style="height:${h}%;background:${phaseColor(s.phase)}" title="${s.label} ${s.duration}s"></div>`;
+    }).join('');
+
+    const workDurs = steps.filter(s => s.phase === 'work').map(s => formatSecShort(s.duration));
+    document.getElementById('prev-ribbon').textContent = workDurs.length
+      ? `Séquence efforts : ${workDurs.join(' → ')}`
+      : 'Aucun intervalle d’effort';
+  }
+
+  function saveBuilderWorkout() {
+    const w = getBuilderWorkoutObject();
+    const steps = compileWorkout(w);
+    const stats = getTimelineStats(steps);
+    w.desc = `${stats.workCount} efforts • ${formatMMSS(stats.workTotal)} de travail`;
+
+    const existingIdx = customWorkouts.findIndex(x => x.id === w.id);
+    if (existingIdx >= 0) {
+      customWorkouts[existingIdx] = w;
+    } else {
+      customWorkouts.unshift(w);
+    }
+    editingId = null;
+    localStorage.setItem(STORAGE_WORKOUTS, JSON.stringify(customWorkouts));
+    renderWorkoutLists();
+    switchTab('home');
+    showToast('Séance enregistrée !');
+  }
+
+  function launchBuilderWorkout() {
+    launchWorkout(getBuilderWorkoutObject());
+  }
+
+  function loadIntoBuilder(id, isCustom) {
+    const w = findWorkout(id, isCustom);
+    if (!w) return;
+    editingId = isCustom ? w.id : null;
+    document.getElementById('b-name').value = isCustom ? w.name : `${w.name} (Copie)`;
+
+    if (w.mode === 'standard') {
+      stdDraft = JSON.parse(JSON.stringify(w.config));
+    } else if (w.mode === 'progressive') {
+      progDraft = JSON.parse(JSON.stringify(w.config));
+    } else if (w.mode === 'multiblock') {
+      multiDraft = JSON.parse(JSON.stringify(w.config.blocks));
+    }
+    switchBuilderMode(w.mode);
+    syncBuilderUI();
+    switchTab('builder');
+  }
+
+  /* ================= MOTEUR AUDIO WEB AUDIO & SYNTHÈSE VOCALE ================= */
+  let audioCtx = null;
+
+  function ensureAudioContext() {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  }
+
+  function playTone(freq, duration = 0.14, type = 'sine', delay = 0, vol = 0.28) {
+    if (!settings.sound) return;
+    ensureAudioContext();
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime + delay;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  function playPhaseCue(phase) {
+    if (phase === 'work') {
+      playTone(880, 0.13, 'triangle', 0, 0.35);
+      playTone(1174.66, 0.22, 'triangle', 0.14, 0.38);
+      triggerVibration([120, 60, 180]);
+    } else if (phase === 'rest' || phase === 'cycle') {
+      playTone(659.25, 0.14, 'sine', 0, 0.3);
+      playTone(440, 0.22, 'sine', 0.15, 0.3);
+      triggerVibration([160]);
+    } else if (phase === 'done') {
+      playTone(523.25, 0.13, 'triangle', 0, 0.32);
+      playTone(659.25, 0.13, 'triangle', 0.14, 0.32);
+      playTone(783.99, 0.13, 'triangle', 0.28, 0.32);
+      playTone(1046.5, 0.35, 'triangle', 0.42, 0.38);
+      triggerVibration([150, 80, 150, 80, 300]);
+    }
+  }
+
+  function playCountdownTick(secLeft) {
+    if (!settings.countdown) return;
+    playTone(secLeft === 1 ? 784 : 587.33, 0.09, 'sine', 0, 0.22);
+    triggerVibration([40]);
+  }
+
+  function triggerVibration(pattern) {
+    if (settings.vibrate && navigator.vibrate) {
+      navigator.vibrate(pattern);
+    }
+  }
+
+  function speakText(text) {
+    if (!settings.voice || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = 1.08;
+      window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+
+  function formatSpokenDuration(sec) {
+    if (sec < 60) return `${sec} secondes`;
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    const mStr = m === 1 ? '1 minute' : `${m} minutes`;
+    return s === 0 ? mStr : `${mStr} ${s}`;
+  }
+
+  function announceStep(step) {
+    const spokenDur = formatSpokenDuration(step.duration);
+    if (step.phase === 'prep') speakText(`Préparation, ${spokenDur}`);
+    else if (step.phase === 'work') speakText(`Effort, ${spokenDur}`);
+    else if (step.phase === 'rest') speakText(`Repos, ${spokenDur}`);
+    else if (step.phase === 'cycle') speakText(`Pause, ${spokenDur}`);
+    else if (step.phase === 'cool') speakText(`Retour au calme, ${spokenDur}`);
+  }
+
+  function testAudioFeedback() {
+    ensureAudioContext();
+    playPhaseCue('work');
+    setTimeout(() => speakText('Effort, trente secondes'), 320);
+  }
+
+  /* ================= WAKE LOCK API ================= */
+  let wakeLockSentinel = null;
+
+  async function requestWakeLock() {
+    if (!settings.wakelock || !('wakeLock' in navigator)) return;
+    try {
+      wakeLockSentinel = await navigator.wakeLock.request('screen');
+    } catch (_) {}
+  }
+
+  function releaseWakeLock() {
+    if (wakeLockSentinel) {
+      wakeLockSentinel.release().catch(() => {});
+      wakeLockSentinel = null;
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && playerState.active && !playerState.paused) {
+      requestWakeLock();
+    }
+  });
+
+  /* ================= MOTEUR CHRONOMÈTRE HAUTE PRÉCISION ================= */
+  const RING_CIRCUMFERENCE = 2 * Math.PI * 120; // 753.98
+
+  let playerState = {
+    active: false,
+    paused: false,
+    workout: null,
+    steps: [],
+    stepIndex: 0,
+    stepEndTime: 0,
+    stepRemainingMs: 0,
+    lastAnnouncedSec: -1,
+    rafId: null
+  };
+
+  function launchWorkout(workout) {
+    ensureAudioContext();
+    const steps = compileWorkout(workout);
+    playerState = {
+      active: true,
+      paused: false,
+      workout,
+      steps,
+      stepIndex: 0,
+      stepEndTime: 0,
+      stepRemainingMs: 0,
+      lastAnnouncedSec: -1,
+      rafId: null
+    };
+
+    document.getElementById('pl-title').textContent = workout.name;
+    document.getElementById('player-active-body').style.display = 'flex';
+    document.getElementById('player-done-body').style.display = 'none';
+    document.getElementById('pl-play-pause').textContent = '⏸ Pause';
+    unlockScreen();
+
+    document.getElementById('player').classList.add('open');
+    requestWakeLock();
+    enterStep(0, true);
+    tickLoop();
+  }
+
+  function enterStep(index, withAudio = true) {
+    if (index >= playerState.steps.length) {
+      finishWorkout();
+      return;
+    }
+    if (index < 0) index = 0;
+
+    playerState.stepIndex = index;
+    const step = playerState.steps[index];
+    playerState.stepRemainingMs = step.duration * 1000;
+    playerState.stepEndTime = performance.now() + playerState.stepRemainingMs;
+    playerState.lastAnnouncedSec = step.duration;
+
+    // Styling dynamique
+    const color = phaseColor(step.phase);
+    const bg = phaseBg(step.phase);
+    const pill = document.getElementById('pl-phase-badge');
+    pill.textContent = step.label;
+    pill.style.color = color;
+    pill.style.background = bg;
+
+    document.getElementById('pl-phase-sub').textContent = step.sub;
+    document.getElementById('pl-ring').style.stroke = color;
+    document.getElementById('pl-step-meta').textContent = `Étape ${index + 1} / ${playerState.steps.length}`;
+    document.getElementById('pl-round-badge').textContent = step.roundInfo;
+
+    const nextStep = playerState.steps[index + 1];
+    if (nextStep) {
+      document.getElementById('pl-next').textContent = `${nextStep.label} • ${nextStep.sub}`;
+      document.getElementById('pl-next-dur').textContent = formatSecShort(nextStep.duration);
+    } else {
+      document.getElementById('pl-next').textContent = 'Fin de la séance';
+      document.getElementById('pl-next-dur').textContent = '🏁';
+    }
+
+    if (withAudio && !playerState.paused) {
+      if (index > 0) playPhaseCue(step.phase);
+      announceStep(step);
+    }
+
+    renderPlayerFrame(playerState.stepRemainingMs);
+  }
+
+  function tickLoop() {
+    if (!playerState.active) return;
+
+    if (!playerState.paused) {
+      const now = performance.now();
+      const remMs = playerState.stepEndTime - now;
+
+      if (remMs <= 0) {
+        enterStep(playerState.stepIndex + 1, true);
+      } else {
+        playerState.stepRemainingMs = remMs;
+        const secCeil = Math.ceil(remMs / 1000);
+        if (secCeil !== playerState.lastAnnouncedSec) {
+          playerState.lastAnnouncedSec = secCeil;
+          if (secCeil <= 3 && secCeil >= 1) {
+            playCountdownTick(secCeil);
+          }
+        }
+        renderPlayerFrame(remMs);
+      }
+    }
+
+    playerState.rafId = requestAnimationFrame(tickLoop);
+  }
+
+  function renderPlayerFrame(remMs) {
+    const step = playerState.steps[playerState.stepIndex];
+    const totalStepMs = step.duration * 1000;
+    const progress = Math.max(0, Math.min(1, 1 - remMs / totalStepMs));
+
+    document.getElementById('pl-time').textContent = formatMMSS(remMs / 1000);
+    document.getElementById('pl-ring').style.strokeDashoffset = (RING_CIRCUMFERENCE * progress).toFixed(2);
+
+    // Progression globale
+    let elapsedBefore = 0;
+    let totalAll = 0;
+    playerState.steps.forEach((s, i) => {
+      totalAll += s.duration;
+      if (i < playerState.stepIndex) elapsedBefore += s.duration;
+    });
+    const currentStepElapsed = Math.max(0, step.duration - remMs / 1000);
+    const totalElapsed = elapsedBefore + currentStepElapsed;
+    const totalRem = Math.max(0, totalAll - totalElapsed);
+    const pct = totalAll > 0 ? Math.min(100, (totalElapsed / totalAll) * 100) : 100;
+
+    document.getElementById('pl-total-fill').style.width = `${pct.toFixed(1)}%`;
+    document.getElementById('pl-elapsed').textContent = `Écoulé : ${formatMMSS(totalElapsed)}`;
+    document.getElementById('pl-remaining').textContent = `Restant : ${formatMMSS(totalRem)}`;
+  }
+
+  function togglePause() {
+    ensureAudioContext();
+    playerState.paused = !playerState.paused;
+    const btn = document.getElementById('pl-play-pause');
+    if (playerState.paused) {
+      btn.textContent = '▶ Reprendre';
+      releaseWakeLock();
+    } else {
+      playerState.stepEndTime = performance.now() + playerState.stepRemainingMs;
+      btn.textContent = '⏸ Pause';
+      requestWakeLock();
+    }
+  }
+
+  function skipStep(dir) {
+    ensureAudioContext();
+    if (dir < 0) {
+      const step = playerState.steps[playerState.stepIndex];
+      const elapsedSec = step.duration - playerState.stepRemainingMs / 1000;
+      if (elapsedSec > 2.5) {
+        enterStep(playerState.stepIndex, false);
+        return;
+      }
+    }
+    enterStep(playerState.stepIndex + dir, !playerState.paused);
+  }
+
+  function finishWorkout() {
+    playerState.paused = true;
+    cancelAnimationFrame(playerState.rafId);
+    releaseWakeLock();
+    playPhaseCue('done');
+    speakText('Séance terminée, félicitations !');
+
+    const stats = getTimelineStats(playerState.steps);
+    document.getElementById('done-name').textContent = playerState.workout.name;
+    document.getElementById('done-total-time').textContent = formatMMSS(stats.total);
+    document.getElementById('done-work-time').textContent = formatMMSS(stats.workTotal);
+
+    document.getElementById('player-active-body').style.display = 'none';
+    document.getElementById('player-done-body').style.display = 'flex';
+  }
+
+  function restartWorkout() {
+    if (playerState.workout) launchWorkout(playerState.workout);
+  }
+
+  function closePlayer() {
+    playerState.active = false;
+    cancelAnimationFrame(playerState.rafId);
+    releaseWakeLock();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.getElementById('player').classList.remove('open');
+  }
+
+  /* ================= VERROUILLAGE ÉCRAN ================= */
+  let unlockHoldTimer = null;
+
+  function lockScreen() {
+    document.getElementById('lock-shield').classList.add('active');
+  }
+
+  function unlockScreen() {
+    cancelUnlockHold();
+    document.getElementById('lock-shield').classList.remove('active');
+  }
+
+  function startUnlockHold() {
+    const btn = document.getElementById('unlock-hold-btn');
+    btn.style.borderColor = 'var(--c-work)';
+    unlockHoldTimer = setTimeout(() => {
+      unlockScreen();
+      showToast('Écran déverrouillé');
+    }, 800);
+  }
+
+  function cancelUnlockHold() {
+    clearTimeout(unlockHoldTimer);
+    const btn = document.getElementById('unlock-hold-btn');
+    if (btn) btn.style.borderColor = 'var(--border)';
+  }
+
+  /* ================= RÉGLAGES & EXPORT/IMPORT ================= */
+  function initSettingsUI() {
+    document.getElementById('set-sound').checked = settings.sound;
+    document.getElementById('set-countdown').checked = settings.countdown;
+    document.getElementById('set-voice').checked = settings.voice;
+    document.getElementById('set-vibrate').checked = settings.vibrate;
+    document.getElementById('set-wakelock').checked = settings.wakelock;
+  }
+
+  function updateSetting(key, val) {
+    settings[key] = val;
+    localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+    if (key === 'wakelock' && playerState.active && !playerState.paused) {
+      val ? requestWakeLock() : releaseWakeLock();
+    }
+  }
+
+  function exportData() {
+    const payload = JSON.stringify({ version: 2, workouts: customWorkouts, settings }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tabata-pro-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (Array.isArray(data.workouts)) {
+          customWorkouts = data.workouts;
+          localStorage.setItem(STORAGE_WORKOUTS, JSON.stringify(customWorkouts));
+          renderWorkoutLists();
+          showToast(`${customWorkouts.length} séance(s) importée(s)`);
+        }
+      } catch (_) {
+        showToast('Fichier JSON invalide');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  /* ================= INITIALISATION ================= */
+  renderQuickTimer();
+  renderWorkoutLists();
+  syncBuilderUI();
+  initSettingsUI();
+</script>
+</body>
+</html>
